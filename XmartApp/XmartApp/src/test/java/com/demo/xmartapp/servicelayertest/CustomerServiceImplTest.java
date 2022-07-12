@@ -30,7 +30,6 @@ import com.demo.xmartapp.service.CustomerServiceImpl;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 
 public class CustomerServiceImplTest {
-
 	private CustomerEntity customerEntity;
 	private CustomerDTO customerDTO;
 	@Mock
