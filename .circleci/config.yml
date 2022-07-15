@@ -5,22 +5,47 @@ version: 2.1
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  say-hello:
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
+  build:
+    environment:
+      CC_TEST_REPORTER_ID: 33c2f8c8464e87a081811157d9cbd95ef14f308e68de2666e962a330deb12cb1
     docker:
-      - image: cimg/base:stable
-    # Add steps to the job
-    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
+      - image: "cimg/openjdk:11.0-browsers"
+    working_directory: ~/repo
     steps:
       - checkout
+      #- run:
+      #    name: Setup dependencies
+      #    command: |
+      #      sudo composer self-update
+      #      composer install -n --prefer-dist
       - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
+          name: Setup Code Climate test-reporter
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+      - run:
+          name: Run tests
+          command: |
+            #sudo docker-php-ext-enable xdebug
+            ./cc-test-reporter before-build
+            #sudo vendor/bin/phpunit --coverage-clover clover.xml
+            #cd ./XmartApp/XmartApp
+            mvn -f ./XmartApp/XmartApp/pom.xml test
+      - store_artifacts:
+          path: target 
+      - run:
+          name: "Upload Coverage"
+          command: |
+            find .
+            JACOCO_SOURCE_PATH=/home/circleci/repo/XmartApp/XmartApp/src/main/java ./cc-test-reporter \
+              format-coverage XmartApp/XmartApp/target/my-reports/jacoco.xml     \
+              --input-type jacoco \
+              --add-prefix XmartApp/XmartApp
+            ./cc-test-reporter upload-coverage
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  say-hello-workflow:
+  build-workflow:
     jobs:
-      - say-hello
+      - build

@@ -25,7 +25,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 
 @WebMvcTest
 public class CustomerApiTest {
-
 	private CustomerEntity customerEntity;
 	@Autowired
 	private MockMvc mockMvc;
@@ -63,11 +62,6 @@ public class CustomerApiTest {
 
 	@Test
 	public void fetchCustomerListTest() throws Exception {
-		/*
-		 * mockMvc.perform(MockMvcRequestBuilders.get("/")).andDo(print())
-		 * //.andExpect(status().isOk()) .andExpect((ResultMatcher)
-		 * content().string(containsString("Welcome to X-mart Application!")));
-		 */
 		mockMvc.perform(MockMvcRequestBuilders.get("/")).andExpect(new ResultMatcher() {
 			@Override
 			public void match(MvcResult result) throws Exception {
@@ -76,5 +70,4 @@ public class CustomerApiTest {
 		});
 
 	}
-
 }
